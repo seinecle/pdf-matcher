@@ -18,8 +18,8 @@ public class ContextExtractor {
     }
 
     public static String extract(String word, String line, int lengthContext) {
-        System.out.println("word: "+ word);
-        System.out.println("line: "+ line);
+//        System.out.println("word: "+ word);
+//        System.out.println("line: "+ line);
         
         String wordWithOriginalCase = word;
         word = word.toLowerCase();
