@@ -4,6 +4,7 @@
  */
 package net.clementlevallois.pdfmatcher.controller;
 
+import net.clementlevallois.functions.model.Occurrence;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,12 +24,12 @@ public class PdfMatcher {
         System.out.println("Hello World!");
     }
 
-    public List<Occurrence> analyze(TreeMap<Integer, Integer> pagesAndStartingLine, String searchedTerm, Map<Integer, String> lines, int lengthContext) {
+    public List<Occurrence> analyze(TreeMap<Integer, Integer> pagesAndStartingLine, String searchedTerm, Map<Integer, String> lines, int lengthContext, boolean caseSensitive) {
 
         List<Occurrence> occurrences = new ArrayList();
 
-        searchedTerm = TextCleaningOps.doAllCleaningOps(searchedTerm);
-        searchedTerm = searchedTerm.toLowerCase();
+        NaturalQueryEvaluator ev = new NaturalQueryEvaluator();
+        ev.setQueryInNaturalLanguage(searchedTerm, caseSensitive);
 
         Set<Map.Entry<Integer, String>> entrySet = lines.entrySet();
 
@@ -36,7 +37,8 @@ public class PdfMatcher {
             int lineNumber = entry.getKey();
             String line = entry.getValue();
 
-            if (!line.toLowerCase().contains(searchedTerm)) {
+            Boolean matched = ev.evaluate(line);
+            if (matched == null || !matched) {
                 continue;
             }
 
@@ -58,7 +60,7 @@ public class PdfMatcher {
                 if (pageStartingLine > lineNumber) {
                     pageOccurrence = page - 1;
                     break;
-                    
+
                 } else {
                     pageOccurrence = page;
                     break;
