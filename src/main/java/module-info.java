@@ -4,7 +4,6 @@
  */
 
 module net.clementlevallois.pdfmatcher {
-        requires net.clementlevallois.utils;
         requires net.clementlevallois.functions.model;
         requires mvel2;
         

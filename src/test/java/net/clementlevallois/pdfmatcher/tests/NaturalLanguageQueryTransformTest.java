@@ -12,10 +12,11 @@ import org.junit.Test;
  *
  * @author LEVALLOIS
  */
-public class NaturalQueryEvaluatorTest {
+public class NaturalLanguageQueryTransformTest {
 
     @Test
-    public void testPdfmatcher() {
+    public void testNaturalLanguageQueryTransformer() {
+        System.out.println("TEST A");
         String query = """
 
                        "java" OR (python AND programming) AND NOT("monty python")
@@ -35,10 +36,9 @@ public class NaturalQueryEvaluatorTest {
         where the opening double quote is NOT paired with a closing double quote (as it should)
         in this case, the evaluator is expected to return a null value
          */
-        
-        
+        System.out.println("TEST B");
         query = """
-                       "java OR (python AND programming) AND NOT("monty python")
+                       "java OR (python AND programming) AND NOT ("monty python")
 
                 """;
 

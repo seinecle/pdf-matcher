@@ -4,6 +4,7 @@
  */
 
 open module net.clementlevallois.pdfmatcher.tests {
+    requires net.clementlevallois.functions.model;
     requires net.clementlevallois.pdfmatcher;
     requires mvel2;
     requires junit;

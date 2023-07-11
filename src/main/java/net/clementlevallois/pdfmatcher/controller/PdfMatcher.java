@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
-import net.clementlevallois.utils.TextCleaningOps;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -20,30 +20,60 @@ import net.clementlevallois.utils.TextCleaningOps;
  */
 public class PdfMatcher {
 
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-    }
+    public List<Occurrence> analyze(TreeMap<Integer, Integer> pagesAndStartingLine, String searchedTerm, Map<Integer, String> lines, Integer nbWords, Integer nbLines, boolean caseSensitive, String startOfPage, String endOfPage) throws InterruptedException {
 
-    public List<Occurrence> analyze(TreeMap<Integer, Integer> pagesAndStartingLine, String searchedTerm, Map<Integer, String> lines, int lengthContext, boolean caseSensitive) {
+        boolean contextWillBeLines = nbLines != null && nbLines > 0;
 
         List<Occurrence> occurrences = new ArrayList();
 
         NaturalQueryEvaluator ev = new NaturalQueryEvaluator();
         ev.setQueryInNaturalLanguage(searchedTerm, caseSensitive);
 
+        LinkedBlockingQueue preLines = new LinkedBlockingQueue(1);
+        if (contextWillBeLines) {
+            preLines = new LinkedBlockingQueue(nbLines);
+        }
+        List<String> postLines = new ArrayList();
+
         Set<Map.Entry<Integer, String>> entrySet = lines.entrySet();
 
         for (Map.Entry<Integer, String> entry : entrySet) {
             int lineNumber = entry.getKey();
             String line = entry.getValue();
-
+            if (contextWillBeLines) {
+                if (preLines.remainingCapacity() == 0) {
+                    preLines.poll();
+                }
+                if (lines.containsKey(lineNumber - 1)) {
+                    preLines.add(lines.get(lineNumber - 1));
+                }
+                postLines = new ArrayList(nbLines);
+                for (int i = 1; i <= nbLines; i++) {
+                    if (lines.containsKey(lineNumber + i)) {
+                        postLines.add(lines.get(lineNumber + i));
+                    }
+                }
+            }
             Boolean matched = ev.evaluate(line);
             if (matched == null || !matched) {
                 continue;
             }
 
+            if (preLines.remainingCapacity() > 0) {
+                preLines.put(startOfPage);
+            }
+            if (postLines.size() < nbLines) {
+                postLines.add(endOfPage);
+            }
+
             Occurrence occ = new Occurrence();
-            String context = ContextExtractor.extract(searchedTerm, line, lengthContext);
+            String context = "";
+
+            if (contextWillBeLines) {
+                context = ContextExtractor.extractSurroundingLines(ev.getKeywordsFound(), searchedTerm, line, preLines, postLines, caseSensitive, startOfPage, endOfPage);
+            } else {
+                context = ContextExtractor.extractSurroundingWords(ev.getKeywordsFound(), searchedTerm, line, nbWords, caseSensitive);
+            }
             occ.setContext(context);
 
             int pageOccurrence = 1;
@@ -70,6 +100,5 @@ public class PdfMatcher {
             occurrences.add(occ);
         }
         return occurrences;
-
     }
 }
