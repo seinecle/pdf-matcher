@@ -59,13 +59,14 @@ public class PdfMatcher {
                 continue;
             }
 
-            if (preLines.remainingCapacity() > 0) {
-                preLines.put(startOfPage);
+            if (contextWillBeLines) {
+                if (preLines.remainingCapacity() > 0) {
+                    preLines.put(startOfPage);
+                }
+                if (postLines.size() < nbLines) {
+                    postLines.add(endOfPage);
+                }
             }
-            if (postLines.size() < nbLines) {
-                postLines.add(endOfPage);
-            }
-
             Occurrence occ = new Occurrence();
             String context = "";
 

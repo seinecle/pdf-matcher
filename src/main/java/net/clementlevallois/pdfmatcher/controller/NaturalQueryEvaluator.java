@@ -143,9 +143,9 @@ public class NaturalQueryEvaluator {
         rule = rule.replace("! ", "!");
         Boolean matched = null;
         try {
-            matched = ((Boolean) MVEL.eval(sb.toString(), mapLetters));
+            matched = ((Boolean) MVEL.eval(rule, mapLetters));
         } catch (Exception e) {
-            System.out.println("error with rule: " + rule);
+            matched = false;
         }
 
         return matched;

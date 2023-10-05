@@ -15,11 +15,6 @@
     <dependencies>
         <dependency>
             <groupId>net.clementlevallois.functions</groupId>
-            <artifactId>umigon-model</artifactId>
-            <version>0.12</version>
-        </dependency>
-        <dependency>
-            <groupId>net.clementlevallois.functions</groupId>
             <artifactId>functions-model</artifactId>
             <version>1.0</version>
         </dependency>
@@ -37,6 +32,5 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 </project>
